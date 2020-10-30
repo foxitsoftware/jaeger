@@ -87,7 +87,8 @@ func (aH *APIHandler) SaveSpan(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf(UnableToReadBodyErrFormat, err), http.StatusBadRequest)
 		return
 	}
-	batch.Process.Tags = append(batch.Process.GetTags(), &tJaeger.Tag{Key: "remoteAddr", VStr: &r.RemoteAddr})
+	ip := r.RemoteAddr[:strings.Index(r.RemoteAddr,":")]
+	batch.Process.Tags = append(batch.Process.GetTags(), &tJaeger.Tag{Key: "remoteAddr", VStr: &ip})
 	batches := []*tJaeger.Batch{batch}
 	opts := SubmitBatchOptions{InboundTransport: processor.HTTPTransport}
 	if _, err = aH.jaegerBatchesHandler.SubmitBatches(batches, opts); err != nil {
