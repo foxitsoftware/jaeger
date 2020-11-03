@@ -63,6 +63,12 @@ func (aH *APIHandler) RegisterRoutes(router *mux.Router) {
 
 // SaveSpan submits the span provided in the request body to the JaegerBatchesHandler
 func (aH *APIHandler) SaveSpan(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	
+	if r.Method == http.MethodOptions {
+		return
+	}
+
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 	r.Body.Close()
 	if err != nil {
