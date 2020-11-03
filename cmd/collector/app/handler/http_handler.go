@@ -20,6 +20,7 @@ import (
 	"io/ioutil"
 	"mime"
 	"net/http"
+	"strings"
 
 	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/gorilla/mux"
@@ -56,7 +57,8 @@ func NewAPIHandler(
 
 // RegisterRoutes registers routes for this handler on the given router
 func (aH *APIHandler) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/api/traces", aH.SaveSpan).Methods(http.MethodPost)
+	router.HandleFunc("/api/traces", aH.SaveSpan).Methods(http.MethodPost,http.MethodOptions)
+	router.Use(mux.CORSMethodMiddleware(router))
 }
 
 // SaveSpan submits the span provided in the request body to the JaegerBatchesHandler
