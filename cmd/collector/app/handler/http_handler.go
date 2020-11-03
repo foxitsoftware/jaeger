@@ -57,18 +57,11 @@ func NewAPIHandler(
 
 // RegisterRoutes registers routes for this handler on the given router
 func (aH *APIHandler) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/api/traces", aH.SaveSpan).Methods(http.MethodPost,http.MethodOptions)
-	router.Use(mux.CORSMethodMiddleware(router))
+	router.HandleFunc("/api/traces", aH.SaveSpan).Methods(http.MethodPost)
 }
 
 // SaveSpan submits the span provided in the request body to the JaegerBatchesHandler
 func (aH *APIHandler) SaveSpan(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	
-	if r.Method == http.MethodOptions {
-		return
-	}
-
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 	r.Body.Close()
 	if err != nil {
