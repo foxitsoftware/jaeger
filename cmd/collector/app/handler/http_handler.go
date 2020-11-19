@@ -17,13 +17,12 @@ package handler
 
 import (
 	"fmt"
+	"github.com/apache/thrift/lib/go/thrift"
+	"github.com/gorilla/mux"
+	"github.com/thinkeridea/go-extend/exnet"
 	"io/ioutil"
 	"mime"
 	"net/http"
-	"strings"
-
-	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/gorilla/mux"
 
 	"github.com/jaegertracing/jaeger/cmd/collector/app/processor"
 	tJaeger "github.com/jaegertracing/jaeger/thrift-gen/jaeger"
@@ -88,7 +87,7 @@ func (aH *APIHandler) SaveSpan(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf(UnableToReadBodyErrFormat, err), http.StatusBadRequest)
 		return
 	}
-	ip := r.RemoteAddr[:strings.Index(r.RemoteAddr,":")]
+	ip := exnet.ClientPublicIP(r)
 	batch.Process.Tags = append(batch.Process.GetTags(), &tJaeger.Tag{Key: "remoteAddr", VStr: &ip})
 	batches := []*tJaeger.Batch{batch}
 	opts := SubmitBatchOptions{InboundTransport: processor.HTTPTransport}
