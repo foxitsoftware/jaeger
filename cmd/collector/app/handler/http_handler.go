@@ -93,9 +93,11 @@ func (aH *APIHandler) SaveSpan(w http.ResponseWriter, r *http.Request) {
 	}
 	remoteAddr := exnet.RemoteIP(r)
 	forwarder := r.Header.Get("X-Forwarded-For")
+    realIp :=r.Header.Get("X-Real-Ip")
 	batch.Process.Tags = append(batch.Process.GetTags(), &tJaeger.Tag{Key: "remoteAddr", VStr: &remoteAddr})
 	batch.Process.Tags = append(batch.Process.GetTags(), &tJaeger.Tag{Key: "publicIP", VStr: &remoteAddr})
 	batch.Process.Tags = append(batch.Process.GetTags(), &tJaeger.Tag{Key: "xForwardedFor", VStr: &forwarder})
+	batch.Process.Tags = append(batch.Process.GetTags(), &tJaeger.Tag{Key: "xRealIp", VStr: &realIp})
 	batches := []*tJaeger.Batch{batch}
 	opts := SubmitBatchOptions{InboundTransport: processor.HTTPTransport}
 	if _, err = aH.jaegerBatchesHandler.SubmitBatches(batches, opts); err != nil {
