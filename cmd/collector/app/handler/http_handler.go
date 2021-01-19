@@ -23,7 +23,7 @@ import (
 	"io/ioutil"
 	"mime"
 	"net/http"
-
+	"github.com/satori/go.uuid"
 	"github.com/jaegertracing/jaeger/cmd/collector/app/processor"
 	tJaeger "github.com/jaegertracing/jaeger/thrift-gen/jaeger"
 )
@@ -91,7 +91,9 @@ func (aH *APIHandler) SaveSpan(w http.ResponseWriter, r *http.Request) {
 	if ip == "" {
 		ip = exnet.ClientIP(r)
 	}
+	collectorUid :=uuid.NewV4().String()
 	batch.Process.Tags = append(batch.Process.GetTags(), &tJaeger.Tag{Key: "remoteAddr", VStr: &ip})
+	batch.Process.Tags = append(batch.Process.GetTags(), &tJaeger.Tag{Key: "collector-uid", VStr: &collectorUid})
 	batches := []*tJaeger.Batch{batch}
 	opts := SubmitBatchOptions{InboundTransport: processor.HTTPTransport}
 	if _, err = aH.jaegerBatchesHandler.SubmitBatches(batches, opts); err != nil {

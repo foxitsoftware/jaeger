@@ -59,6 +59,7 @@ require (
 	github.com/prometheus/procfs v0.0.10 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563 // indirect
 	github.com/rs/cors v1.7.0
+	github.com/satori/go.uuid v1.2.0
 	github.com/sectioneight/md-to-godoc v0.0.0-20161108233149-55e43be6c335
 	github.com/securego/gosec v0.0.0-20200203094520-d13bb6d2420c
 	github.com/soheilhy/cmux v0.1.4
@@ -70,7 +71,7 @@ require (
 	github.com/spf13/viper v1.6.2
 	github.com/streadway/quantile v0.0.0-20150917103942-b0c588724d25 // indirect
 	github.com/stretchr/testify v1.5.0
-	github.com/thinkeridea/go-extend v1.1.2 // indirect
+	github.com/thinkeridea/go-extend v1.1.2
 	github.com/uber/jaeger-client-go v2.22.1+incompatible
 	github.com/uber/jaeger-lib v2.2.0+incompatible
 	github.com/uber/tchannel-go v1.16.0
