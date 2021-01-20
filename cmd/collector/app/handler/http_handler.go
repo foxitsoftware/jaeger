@@ -19,13 +19,13 @@ import (
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/gorilla/mux"
+	"github.com/jaegertracing/jaeger/cmd/collector/app/processor"
+	tJaeger "github.com/jaegertracing/jaeger/thrift-gen/jaeger"
+	"github.com/satori/go.uuid"
 	"github.com/thinkeridea/go-extend/exnet"
 	"io/ioutil"
 	"mime"
 	"net/http"
-	"github.com/satori/go.uuid"
-	"github.com/jaegertracing/jaeger/cmd/collector/app/processor"
-	tJaeger "github.com/jaegertracing/jaeger/thrift-gen/jaeger"
 )
 
 const (
@@ -87,13 +87,15 @@ func (aH *APIHandler) SaveSpan(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf(UnableToReadBodyErrFormat, err), http.StatusBadRequest)
 		return
 	}
+	for _, span := range batch.Spans {
+		collectorUid := uuid.NewV4().String()
+		span.Tags = append(span.Tags, &tJaeger.Tag{Key: "collector-uid",VStr: &collectorUid})
+	}
 	ip := exnet.ClientPublicIP(r)
 	if ip == "" {
 		ip = exnet.ClientIP(r)
 	}
-	collectorUid :=uuid.NewV4().String()
 	batch.Process.Tags = append(batch.Process.GetTags(), &tJaeger.Tag{Key: "remoteAddr", VStr: &ip})
-	batch.Process.Tags = append(batch.Process.GetTags(), &tJaeger.Tag{Key: "collector-uid", VStr: &collectorUid})
 	batches := []*tJaeger.Batch{batch}
 	opts := SubmitBatchOptions{InboundTransport: processor.HTTPTransport}
 	if _, err = aH.jaegerBatchesHandler.SubmitBatches(batches, opts); err != nil {
